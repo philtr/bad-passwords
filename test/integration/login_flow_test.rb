@@ -3,6 +3,9 @@ require "test_helper"
 class LoginFlowTest < ActionDispatch::IntegrationTest
   setup do
     ENV["JWT_ISSUER"] = "bad-passwords-test"
+    keypair = OpenSSL::PKey::RSA.generate(2048)
+    ENV["JWT_PRIVATE_KEY"] = keypair.to_pem
+    ENV["JWT_PUBLIC_KEY"] = keypair.public_key.to_pem
     @password = "correct horse battery staple"
     @hash = Argon2::Password.create(@password)
     User.create!(email: "user@example.com", password_hash_url: "https://example.com/hash.txt")
@@ -34,6 +37,7 @@ class LoginFlowTest < ActionDispatch::IntegrationTest
 
     follow_redirect!
     assert_response :success
+    assert_match ENV["JWT_PUBLIC_KEY"], response.body
     assert_match "Login succeeded.", response.body
     assert_match "Decoded Token", response.body
     assert_match "user@example.com", response.body
@@ -44,14 +48,14 @@ class LoginFlowTest < ActionDispatch::IntegrationTest
     post "/login", params: { email: "missing@example.com", password: @password }, as: :json
 
     assert_response :unprocessable_entity
-    assert_equal "Unknown email address.", JSON.parse(response.body)["error"]
+    assert_equal "Invalid email or password.", JSON.parse(response.body)["error"]
   end
 
   test "rejects an incorrect password" do
     post "/login", params: { email: "user@example.com", password: "wrong password" }, as: :json
 
     assert_response :unprocessable_entity
-    assert_equal "Password does not match the remote Argon2 hash.", JSON.parse(response.body)["error"]
+    assert_equal "Invalid email or password.", JSON.parse(response.body)["error"]
   end
 
   test "rejects unreachable remote hashes" do

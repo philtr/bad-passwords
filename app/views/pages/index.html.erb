@@ -7,6 +7,10 @@
 
 <p>Register an email address with a URL that serves a plaintext Argon2 password hash, then test login against the current remote hash.</p>
 
+<h2>JWT Public Key</h2>
+
+<pre><%= @jwt_public_key %></pre>
+
 <table>
   <tr>
     <td valign="top">
@@ -240,5 +244,5 @@
 <p>Error JSON response:</p>
 
 <pre>{
-  "error": "Unknown email address."
+  "error": "Invalid email or password."
 }</pre>

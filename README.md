@@ -44,6 +44,13 @@ Set the JWT issuer:
 export JWT_ISSUER=bad-passwords-dev
 ```
 
+Set the JWT signing keypair:
+
+```bash
+export JWT_PRIVATE_KEY="$(cat path/to/jwt_private.pem)"
+export JWT_PUBLIC_KEY="$(cat path/to/jwt_public.pem)"
+```
+
 Start the server:
 
 ```bash
@@ -126,7 +133,7 @@ Error response:
 
 ```json
 {
-  "error": "Unknown email address."
+  "error": "Invalid email or password."
 }
 ```
 
@@ -159,7 +166,7 @@ curl -i http://127.0.0.1:3000/login \
 
 ## JWT
 
-Successful login returns an HS256-signed JWT using Rails `secret_key_base`.
+Successful login returns an RS256-signed JWT using the keypair from `JWT_PRIVATE_KEY` and `JWT_PUBLIC_KEY`.
 
 Claims:
 
@@ -217,3 +224,4 @@ JWT_ISSUER=bad-passwords-test bin/rails test
 - HTML form submissions still use standard Rails CSRF protection.
 - The app stores only `email` and `password_hash_url`.
 - The app does not store plaintext passwords or local password digests.
+- Unknown email and wrong password return the same login error message to reduce account enumeration risk.

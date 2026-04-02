@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+require "openssl"
+
+keypair = OpenSSL::PKey::RSA.generate(2048)
+
+puts "JWT_PRIVATE_KEY:"
+puts keypair.to_pem
+puts
+puts "JWT_PUBLIC_KEY:"
+puts keypair.public_key.to_pem

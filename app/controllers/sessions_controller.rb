@@ -1,4 +1,6 @@
 class SessionsController < ApplicationController
+  INVALID_CREDENTIALS_MESSAGE = "Invalid email or password.".freeze
+
   def create
     @registration_user = User.new
     @login_email = login_params[:email].to_s
@@ -6,12 +8,16 @@ class SessionsController < ApplicationController
     @login_result = nil
 
     user = User.find_by(email: login_params[:email])
-    return respond_with_login_result(false, "Unknown email address.") unless user
+    return respond_with_login_result(false, INVALID_CREDENTIALS_MESSAGE) unless user
 
     verification = RemotePasswordVerifier.new(
       password: login_params[:password],
       password_hash_url: user.password_hash_url
     ).call
+    if !verification.success? && verification.message == "Password does not match the remote Argon2 hash."
+      return respond_with_login_result(false, INVALID_CREDENTIALS_MESSAGE)
+    end
+
     return respond_with_login_result(false, verification.message) unless verification.success?
 
     token = JwtIssuer.new(user: user).call

@@ -6,16 +6,24 @@ class JwtIssuer
   end
 
   def call
-    JWT.encode(payload, secret, "HS256")
+    JWT.encode(payload, private_key, "RS256")
   end
 
   def self.decode(token)
-    payload, = JWT.decode(token, secret, true, algorithm: "HS256")
+    payload, = JWT.decode(token, public_key, true, algorithm: "RS256")
     payload
   end
 
-  def self.secret
-    Rails.application.secret_key_base
+  def self.private_key
+    OpenSSL::PKey::RSA.new(normalized_key(ENV.fetch("JWT_PRIVATE_KEY")))
+  end
+
+  def self.public_key
+    OpenSSL::PKey::RSA.new(normalized_key(ENV.fetch("JWT_PUBLIC_KEY")))
+  end
+
+  def self.normalized_key(key)
+    key.gsub("\\n", "\n")
   end
 
   private
@@ -34,7 +42,7 @@ class JwtIssuer
     }
   end
 
-  def secret
-    self.class.secret
+  def private_key
+    self.class.private_key
   end
 end

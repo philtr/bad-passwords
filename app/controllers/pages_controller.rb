@@ -4,6 +4,7 @@ class PagesController < ApplicationController
     @login_email = ""
     @registration_result = flash[:registration_result]&.deep_symbolize_keys
     @login_result = flash[:login_result]&.deep_symbolize_keys
+    @jwt_public_key = ENV["JWT_PUBLIC_KEY"].to_s
   end
 
   def test_password
