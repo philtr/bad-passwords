@@ -25,7 +25,6 @@ class LoginFlowTest < ActionDispatch::IntegrationTest
 
     payload = JwtIssuer.decode(body["token"])
     assert_equal "user@example.com", payload["sub"]
-    assert_equal "user@example.com", payload["email"]
     assert_equal "bad-passwords-test", payload["iss"]
     assert_operator payload["exp"], :>, payload["iat"]
   end

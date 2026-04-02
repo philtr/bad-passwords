@@ -35,7 +35,6 @@ class JwtIssuer
 
     {
       "sub" => user.email,
-      "email" => user.email,
       "iss" => ENV.fetch("JWT_ISSUER"),
       "iat" => issued_at,
       "exp" => issued_at + TTL.to_i

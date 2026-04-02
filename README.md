@@ -171,7 +171,6 @@ Successful login returns an RS256-signed JWT using the keypair from `JWT_PRIVATE
 Claims:
 
 - `sub`
-- `email`
 - `iss`
 - `iat`
 - `exp`
