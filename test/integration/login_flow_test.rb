@@ -30,6 +30,9 @@ class LoginFlowTest < ActionDispatch::IntegrationTest
   test "renders the HTML result page with token details" do
     post "/login", params: { email: "user@example.com", password: @password }
 
+    assert_redirected_to "/"
+
+    follow_redirect!
     assert_response :success
     assert_match "Login succeeded.", response.body
     assert_match "Decoded Token", response.body

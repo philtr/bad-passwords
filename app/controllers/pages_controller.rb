@@ -2,8 +2,8 @@ class PagesController < ApplicationController
   def index
     @registration_user = User.new
     @login_email = ""
-    @registration_result = nil
-    @login_result = nil
+    @registration_result = flash[:registration_result]&.deep_symbolize_keys
+    @login_result = flash[:login_result]&.deep_symbolize_keys
   end
 
   def test_password

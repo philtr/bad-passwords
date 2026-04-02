@@ -12,7 +12,10 @@ class RegistrationFlowTest < ActionDispatch::IntegrationTest
   test "registers a user with a matching remote hash" do
     post "/register", params: { email: "user@example.com", password_hash_url: "https://example.com/hash.txt", password: @password }
 
-    assert_response :created
+    assert_redirected_to "/"
+
+    follow_redirect!
+    assert_response :success
     assert_equal "user@example.com", User.last.email
     assert_match "Registration succeeded.", response.body
   end
@@ -22,28 +25,40 @@ class RegistrationFlowTest < ActionDispatch::IntegrationTest
 
     post "/register", params: { email: "user@example.com", password_hash_url: "https://example.com/hash.txt", password: @password }
 
-    assert_response :unprocessable_entity
+    assert_redirected_to "/"
+
+    follow_redirect!
+    assert_response :success
     assert_match "Email has already been taken", response.body
   end
 
   test "rejects unreachable remote hashes" do
     post "/register", params: { email: "user@example.com", password_hash_url: "https://example.com/missing.txt", password: @password }
 
-    assert_response :unprocessable_entity
+    assert_redirected_to "/"
+
+    follow_redirect!
+    assert_response :success
     assert_match "Could not fetch password hash URL.", response.body
   end
 
   test "rejects invalid remote hash content" do
     post "/register", params: { email: "user@example.com", password_hash_url: "https://example.com/not-hash.txt", password: @password }
 
-    assert_response :unprocessable_entity
+    assert_redirected_to "/"
+
+    follow_redirect!
+    assert_response :success
     assert_match "did not return an Argon2 hash", response.body
   end
 
   test "rejects a password that does not match the remote hash" do
     post "/register", params: { email: "user@example.com", password_hash_url: "https://example.com/hash.txt", password: "wrong password" }
 
-    assert_response :unprocessable_entity
+    assert_redirected_to "/"
+
+    follow_redirect!
+    assert_response :success
     assert_match "does not match the remote Argon2 hash", response.body
   end
 end

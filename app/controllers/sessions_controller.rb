@@ -26,7 +26,10 @@ class SessionsController < ApplicationController
     }
 
     respond_to do |format|
-      format.html { render "pages/index", status: :ok }
+      format.html do
+        flash[:login_result] = @login_result
+        redirect_to root_path, status: :see_other
+      end
       format.json { render json: { token: token, token_type: "Bearer", email: user.email }, status: :ok }
     end
   end
@@ -44,7 +47,10 @@ class SessionsController < ApplicationController
     }
 
     respond_to do |format|
-      format.html { render "pages/index", status: :unprocessable_entity }
+      format.html do
+        flash[:login_result] = @login_result
+        redirect_to root_path, status: :see_other
+      end
       format.json { render json: { error: message }, status: :unprocessable_entity }
     end
   end

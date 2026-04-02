@@ -24,8 +24,8 @@ class RegistrationsController < ApplicationController
 
     respond_to do |format|
       format.html do
-        status = @registration_result[:success] ? :created : :unprocessable_entity
-        render "pages/index", status: status
+        flash[:registration_result] = @registration_result
+        redirect_to root_path, status: :see_other
       end
       format.json do
         if @registration_result[:success]
