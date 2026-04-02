@@ -5,4 +5,8 @@ class PagesController < ApplicationController
     @registration_result = nil
     @login_result = nil
   end
+
+  def test_password
+    render plain: Argon2::Password.create("test123")
+  end
 end
