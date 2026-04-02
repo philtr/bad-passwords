@@ -1,0 +1,244 @@
+<% content_for :title, "Bad Passwords" %>
+
+<% success_color = "#006400" %>
+<% error_color = "#8b0000" %>
+
+<h1>Bad Passwords</h1>
+
+<p>Register an email address with a URL that serves a plaintext Argon2 password hash, then test login against the current remote hash.</p>
+
+<table>
+  <tr>
+    <td valign="top">
+      <fieldset>
+        <legend>Register</legend>
+        <%= form_with url: "/register", method: :post, local: true do |form| %>
+          <table>
+            <tr>
+              <td><label for="register_email">Email</label></td>
+              <td><%= form.email_field :email, id: "register_email", value: @registration_user.email %></td>
+            </tr>
+            <tr>
+              <td><label for="register_password_hash_url">Password Hash URL</label></td>
+              <td><%= form.url_field :password_hash_url, id: "register_password_hash_url", value: @registration_user.password_hash_url %></td>
+            </tr>
+            <tr>
+              <td><label for="register_password">Password</label></td>
+              <td><%= form.password_field :password, id: "register_password" %></td>
+            </tr>
+            <tr>
+              <td colspan="2"><%= form.submit "Register" %></td>
+            </tr>
+          </table>
+        <% end %>
+      </fieldset>
+    </td>
+    <td valign="top">
+      <fieldset>
+        <legend>Login Test</legend>
+        <%= form_with url: "/login", method: :post, local: true do |form| %>
+          <table>
+            <tr>
+              <td><label for="login_email">Email</label></td>
+              <td><%= form.email_field :email, id: "login_email", value: @login_email %></td>
+            </tr>
+            <tr>
+              <td><label for="login_password">Password</label></td>
+              <td><%= form.password_field :password, id: "login_password" %></td>
+            </tr>
+            <tr>
+              <td colspan="2"><%= form.submit "Test Login" %></td>
+            </tr>
+          </table>
+        <% end %>
+      </fieldset>
+    </td>
+  </tr>
+</table>
+
+<% if @registration_result %>
+  <h2>Registration Result</h2>
+  <table border="1">
+    <tr>
+      <th>Status</th>
+      <td><font color="<%= @registration_result[:success] ? success_color : error_color %>"><%= @registration_result[:success] ? "success" : "error" %></font></td>
+    </tr>
+    <tr>
+      <th>Message</th>
+      <td><font color="<%= @registration_result[:success] ? success_color : error_color %>"><%= @registration_result[:message] %></font></td>
+    </tr>
+  </table>
+<% end %>
+
+<% if @login_result %>
+  <h2>Login Result</h2>
+  <table border="1">
+    <tr>
+      <th>Status</th>
+      <td><font color="<%= @login_result[:success] ? success_color : error_color %>"><%= @login_result[:success] ? "success" : "error" %></font></td>
+    </tr>
+    <tr>
+      <th>Message</th>
+      <td><font color="<%= @login_result[:success] ? success_color : error_color %>"><%= @login_result[:message] %></font></td>
+    </tr>
+    <% if @login_result[:email] %>
+      <tr>
+        <th>Email</th>
+        <td><%= @login_result[:email] %></td>
+      </tr>
+    <% end %>
+    <% if @login_result[:token] %>
+      <tr>
+        <th>Token</th>
+        <td><%= @login_result[:token] %></td>
+      </tr>
+    <% end %>
+  </table>
+
+  <% if @login_result[:decoded_token] %>
+    <h3>Decoded Token</h3>
+    <table border="1">
+      <% @login_result[:decoded_token].each do |key, value| %>
+        <tr>
+          <th><%= key %></th>
+          <td><%= value %></td>
+        </tr>
+      <% end %>
+    </table>
+  <% end %>
+<% end %>
+
+<hr>
+
+<h2>API Docs</h2>
+
+<p>The API accepts either HTML form posts or JSON requests. For API use, send <code>Accept: application/json</code>. For JSON bodies, also send <code>Content-Type: application/json</code>.</p>
+
+<h3>Environment</h3>
+
+<table border="1">
+  <tr>
+    <th>Setting</th>
+    <th>Details</th>
+  </tr>
+  <tr>
+    <td>JWT_ISSUER</td>
+    <td>Required. Used for the JWT <code>iss</code> claim.</td>
+  </tr>
+</table>
+
+<h3>POST /register</h3>
+
+<table border="1">
+  <tr>
+    <th>Field</th>
+    <th>Required</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>email</td>
+    <td>yes</td>
+    <td>Email address to register. Must be unique.</td>
+  </tr>
+  <tr>
+    <td>password_hash_url</td>
+    <td>yes</td>
+    <td>URL that returns a plaintext Argon2 password hash.</td>
+  </tr>
+  <tr>
+    <td>password</td>
+    <td>yes</td>
+    <td>Plaintext password used to prove the remote hash belongs to the registrant.</td>
+  </tr>
+</table>
+
+<p>Example JSON request:</p>
+
+<pre>{
+  "email": "user@example.com",
+  "password_hash_url": "https://example.com/hash.txt",
+  "password": "correct horse battery staple"
+}</pre>
+
+<p>Successful JSON response:</p>
+
+<pre>{
+  "email": "user@example.com",
+  "password_hash_url": "https://example.com/hash.txt"
+}</pre>
+
+<p>Error JSON response:</p>
+
+<pre>{
+  "error": "Password does not match the remote Argon2 hash."
+}</pre>
+
+<h3>POST /login</h3>
+
+<table border="1">
+  <tr>
+    <th>Field</th>
+    <th>Required</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>email</td>
+    <td>yes</td>
+    <td>Registered email address.</td>
+  </tr>
+  <tr>
+    <td>password</td>
+    <td>yes</td>
+    <td>Plaintext password to verify against the current remote Argon2 hash.</td>
+  </tr>
+</table>
+
+<p>Example JSON request:</p>
+
+<pre>{
+  "email": "user@example.com",
+  "password": "correct horse battery staple"
+}</pre>
+
+<p>Successful JSON response:</p>
+
+<pre>{
+  "token": "JWT_TOKEN_HERE",
+  "token_type": "Bearer",
+  "email": "user@example.com"
+}</pre>
+
+<p>Decoded JWT payload fields:</p>
+
+<table border="1">
+  <tr>
+    <th>Claim</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>sub</td>
+    <td>User email.</td>
+  </tr>
+  <tr>
+    <td>email</td>
+    <td>User email.</td>
+  </tr>
+  <tr>
+    <td>iss</td>
+    <td>Value of <code>JWT_ISSUER</code>.</td>
+  </tr>
+  <tr>
+    <td>iat</td>
+    <td>Issued-at timestamp.</td>
+  </tr>
+  <tr>
+    <td>exp</td>
+    <td>Expiry timestamp, one hour after issue.</td>
+  </tr>
+</table>
+
+<p>Error JSON response:</p>
+
+<pre>{
+  "error": "Unknown email address."
+}</pre>

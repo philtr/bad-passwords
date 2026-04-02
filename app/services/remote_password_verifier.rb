@@ -1,0 +1,38 @@
+require "net/http"
+
+class RemotePasswordVerifier
+  Result = Struct.new(:success?, :message, :password_hash, keyword_init: true)
+
+  def initialize(password:, password_hash_url:)
+    @password = password.to_s
+    @password_hash_url = password_hash_url.to_s
+  end
+
+  def call
+    uri = URI.parse(password_hash_url)
+    response = Net::HTTP.get_response(uri)
+
+    unless response.is_a?(Net::HTTPSuccess)
+      return Result.new(success?: false, message: "Could not fetch password hash URL.")
+    end
+
+    password_hash = response.body.to_s.strip
+    return Result.new(success?: false, message: "Password hash URL did not return an Argon2 hash.") if password_hash.empty?
+
+    if Argon2::Password.verify_password(password, password_hash)
+      Result.new(success?: true, message: "Password verified.", password_hash: password_hash)
+    else
+      Result.new(success?: false, message: "Password does not match the remote Argon2 hash.")
+    end
+  rescue URI::InvalidURIError
+    Result.new(success?: false, message: "Password hash URL is invalid.")
+  rescue Argon2::ArgonHashFail
+    Result.new(success?: false, message: "Password hash URL did not return an Argon2 hash.")
+  rescue StandardError
+    Result.new(success?: false, message: "Could not fetch password hash URL.")
+  end
+
+  private
+
+  attr_reader :password, :password_hash_url
+end
