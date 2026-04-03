@@ -31,13 +31,12 @@ class SessionsController < ApplicationController
       decoded_token: decoded_token
     }
 
-    respond_to do |format|
-      format.html do
-        flash[:login_result] = @login_result
-        redirect_to root_path, status: :see_other
-      end
-      format.json { render json: { token: token, token_type: "Bearer", email: user.email }, status: :ok }
-    end
+    respond_with_result(
+      flash_key: :login_result,
+      result: @login_result,
+      success_payload: { token: token, token_type: "Bearer", email: user.email },
+      success_status: :ok
+    )
   end
 
   private
@@ -52,12 +51,11 @@ class SessionsController < ApplicationController
       message: message
     }
 
-    respond_to do |format|
-      format.html do
-        flash[:login_result] = @login_result
-        redirect_to root_path, status: :see_other
-      end
-      format.json { render json: { error: message }, status: :unprocessable_entity }
-    end
+    respond_with_result(
+      flash_key: :login_result,
+      result: @login_result,
+      success_payload: {},
+      success_status: :ok
+    )
   end
 end

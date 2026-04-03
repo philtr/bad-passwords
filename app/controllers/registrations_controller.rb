@@ -22,19 +22,12 @@ class RegistrationsController < ApplicationController
       }
     end
 
-    respond_to do |format|
-      format.html do
-        flash[:registration_result] = @registration_result
-        redirect_to root_path, status: :see_other
-      end
-      format.json do
-        if @registration_result[:success]
-          render json: { email: @registration_user.email, password_hash_url: @registration_user.password_hash_url }, status: :created
-        else
-          render json: { error: @registration_result[:message] }, status: :unprocessable_entity
-        end
-      end
-    end
+    respond_with_result(
+      flash_key: :registration_result,
+      result: @registration_result,
+      success_payload: { email: @registration_user.email, password_hash_url: @registration_user.password_hash_url },
+      success_status: :created
+    )
   end
 
   private

@@ -8,6 +8,22 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def respond_with_result(flash_key:, result:, success_payload:, success_status:, error_status: :unprocessable_entity)
+    respond_to do |format|
+      format.html do
+        flash[flash_key] = result
+        redirect_to root_path, status: :see_other
+      end
+      format.json do
+        if result[:success]
+          render json: success_payload, status: success_status
+        else
+          render json: { error: result[:message] }, status: error_status
+        end
+      end
+    end
+  end
+
   def render_rate_limited
     respond_to do |format|
       format.html { render plain: "Too many requests.", status: :too_many_requests }
