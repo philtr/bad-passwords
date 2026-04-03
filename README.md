@@ -25,6 +25,8 @@ export JWT_PRIVATE_KEY="$(cat path/to/jwt_private.pem)"
 export JWT_PUBLIC_KEY="$(cat path/to/jwt_public.pem)"
 ```
 
+`JWT_ISSUER` is optional for local development. If omitted, the app uses `bad-passwords-local`.
+
 Then start the server:
 
 ```bash

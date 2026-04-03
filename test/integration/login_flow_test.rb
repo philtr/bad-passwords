@@ -29,6 +29,17 @@ class LoginFlowTest < ActionDispatch::IntegrationTest
     assert_operator payload["exp"], :>, payload["iat"]
   end
 
+  test "uses the default issuer when JWT_ISSUER is unset" do
+    ENV.delete("JWT_ISSUER")
+
+    post "/login", params: { email: "user@example.com", password: @password }, as: :json
+
+    assert_response :success
+    payload = JwtIssuer.decode(JSON.parse(response.body)["token"])
+
+    assert_equal "bad-passwords-local", payload["iss"]
+  end
+
   test "renders the HTML result page with token details" do
     post "/login", params: { email: "user@example.com", password: @password }
 
@@ -55,6 +66,16 @@ class LoginFlowTest < ActionDispatch::IntegrationTest
 
     assert_response :unprocessable_entity
     assert_equal "Invalid email or password.", JSON.parse(response.body)["error"]
+  end
+
+  test "redirects html login failures back to the home page" do
+    post "/login", params: { email: "user@example.com", password: "wrong password" }
+
+    assert_redirected_to "/"
+
+    follow_redirect!
+    assert_response :success
+    assert_match "Invalid email or password.", response.body
   end
 
   test "rejects unreachable remote hashes" do

@@ -1,5 +1,6 @@
 class JwtIssuer
   TTL = 1.hour
+  DEFAULT_ISSUER = "bad-passwords-local".freeze
 
   def initialize(user:)
     @user = user
@@ -35,7 +36,7 @@ class JwtIssuer
 
     {
       "sub" => user.email,
-      "iss" => ENV.fetch("JWT_ISSUER"),
+      "iss" => ENV.fetch("JWT_ISSUER", DEFAULT_ISSUER),
       "iat" => issued_at,
       "exp" => issued_at + TTL.to_i
     }

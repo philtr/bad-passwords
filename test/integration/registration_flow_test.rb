@@ -20,6 +20,16 @@ class RegistrationFlowTest < ActionDispatch::IntegrationTest
     assert_match "Registration succeeded.", response.body
   end
 
+  test "returns json for successful registration" do
+    post "/register", params: { email: "user@example.com", password_hash_url: "https://example.com/hash.txt", password: @password }, as: :json
+
+    assert_response :created
+    body = JSON.parse(response.body)
+
+    assert_equal "user@example.com", body["email"]
+    assert_equal "https://example.com/hash.txt", body["password_hash_url"]
+  end
+
   test "rejects duplicate email addresses" do
     User.create!(email: "user@example.com", password_hash_url: "https://example.com/hash.txt")
 
@@ -30,6 +40,15 @@ class RegistrationFlowTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_response :success
     assert_match "Email has already been taken", response.body
+  end
+
+  test "returns json errors for invalid registration" do
+    User.create!(email: "user@example.com", password_hash_url: "https://example.com/hash.txt")
+
+    post "/register", params: { email: "user@example.com", password_hash_url: "https://example.com/hash.txt", password: @password }, as: :json
+
+    assert_response :unprocessable_entity
+    assert_equal "Email has already been taken", JSON.parse(response.body)["error"]
   end
 
   test "rejects unreachable remote hashes" do
