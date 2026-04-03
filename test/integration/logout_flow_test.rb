@@ -48,6 +48,33 @@ class LogoutFlowTest < ActionDispatch::IntegrationTest
     assert_equal({ "error" => "Invalid token or credentials." }, JSON.parse(response.body))
   end
 
+  test "rejects logout when the email does not exist" do
+    delete "/logout", params: { email: "missing@example.com", password: @password }, as: :json
+
+    assert_response :unauthorized
+    assert_equal({ "error" => "Invalid token or credentials." }, JSON.parse(response.body))
+  end
+
+  test "redirects html logout failures back to the home page" do
+    delete "/logout", params: { email: "user@example.com", password: "wrong password" }
+
+    assert_redirected_to "/"
+
+    follow_redirect!
+    assert_response :success
+    assert_match "Invalid token or credentials.", response.body
+  end
+
+  test "rejects logout when remote hash verification fails" do
+    @user.update!(password_hash_url: "https://example.com/missing.txt")
+    stub_request(:get, "https://example.com/missing.txt").to_return(status: 404, body: "")
+
+    delete "/logout", params: { email: "user@example.com", password: @password }, as: :json
+
+    assert_response :unauthorized
+    assert_equal({ "error" => "Invalid token or credentials." }, JSON.parse(response.body))
+  end
+
   test "rejects logout with an invalid token" do
     delete "/logout", headers: { "Authorization" => "Bearer not-a-jwt" }, as: :json
 

@@ -21,7 +21,7 @@ jobs:
       - name: Prepare test database
         run: bin/rails db:prepare
 
-      - name: Run test suite
+      - name: Run test suite and coverage check
         run: bin/rails test
 
   scan_ruby:
