@@ -87,6 +87,13 @@ class TokenValidationTest < ActionDispatch::IntegrationTest
     assert_equal({ "valid" => false, "error" => "Invalid token." }, JSON.parse(response.body))
   end
 
+  test "renders an invalid html result for a missing token" do
+    post "/validate", params: {}
+
+    assert_response :unauthorized
+    assert_match "Invalid token.", response.body
+  end
+
   test "renders an invalid html validation result" do
     post "/validate", params: { token: "not-a-jwt" }
 
