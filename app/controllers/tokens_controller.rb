@@ -7,6 +7,7 @@ class TokensController < ApplicationController
   end
 
   def validate
+    @token = token_param
     token = bearer_token || token_param
     return respond_with_invalid_token unless token.present?
 
@@ -33,14 +34,14 @@ class TokensController < ApplicationController
     validation_result = {
       success: true,
       message: "Token is valid.",
-      token: token_param,
+      token: @token,
       payload: payload
     }
 
     respond_to do |format|
       format.html do
-        flash[:validation_result] = validation_result
-        redirect_to validate_path, status: :see_other
+        @validation_result = validation_result
+        render :new, status: :ok
       end
       format.json { render json: { valid: true, payload: payload }, status: :ok }
     end
@@ -50,13 +51,13 @@ class TokensController < ApplicationController
     validation_result = {
       success: false,
       message: INVALID_TOKEN_MESSAGE,
-      token: token_param
+      token: @token
     }
 
     respond_to do |format|
       format.html do
-        flash[:validation_result] = validation_result
-        redirect_to validate_path, status: :see_other
+        @validation_result = validation_result
+        render :new, status: :unauthorized
       end
       format.json { render json: { valid: false, error: INVALID_TOKEN_MESSAGE }, status: :unauthorized }
     end

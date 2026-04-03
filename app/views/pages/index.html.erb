@@ -7,9 +7,9 @@
 
 <p>Register an email address with a URL that serves a plaintext Argon2 password hash, then test login against the current remote hash.</p>
 
-<%= render "forms", registration_user: @registration_user, login_email: @login_email %>
-<%= render "registration_result", registration_result: @registration_result, success_color:, error_color: %>
-<%= render "login_result", login_result: @login_result, success_color:, error_color: %>
+<%= render "pages/forms", registration_user: @registration_user, login_email: @login_email %>
+<%= render "pages/registration_result", registration_result: @registration_result, success_color:, error_color: %>
+<%= render "pages/login_result", login_result: @login_result, success_color:, error_color: %>
 
 <hr>
 
@@ -17,4 +17,4 @@
   <a href="/docs">API Docs</a> |
   <a href="/validate">Validate Token</a>
 </p>
-<%= render "public_key", jwt_public_key: @jwt_public_key %>
+<%= render "pages/public_key", jwt_public_key: @jwt_public_key %>

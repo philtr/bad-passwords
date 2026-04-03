@@ -9,6 +9,7 @@ class SessionsController < ApplicationController
     @login_email = login_params[:email].to_s
     @registration_result = nil
     @login_result = nil
+    @jwt_public_key = JwtIssuer.public_key.to_pem
 
     user = User.find_by(email: login_params[:email])
     return respond_with_login_result(false, INVALID_CREDENTIALS_MESSAGE) unless user
@@ -36,8 +37,7 @@ class SessionsController < ApplicationController
 
     respond_to do |format|
       format.html do
-        flash[:login_result] = @login_result
-        redirect_to root_path, status: :see_other
+        render "pages/index", status: :ok
       end
       format.json { render json: { token: token, token_type: "Bearer", email: user.email }, status: :ok }
     end
@@ -122,8 +122,7 @@ class SessionsController < ApplicationController
 
     respond_to do |format|
       format.html do
-        flash[:login_result] = @login_result
-        redirect_to root_path, status: :see_other
+        render "pages/index", status: :unprocessable_entity
       end
       format.json { render json: { error: message }, status: :unprocessable_entity }
     end

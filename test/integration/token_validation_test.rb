@@ -39,9 +39,6 @@ class TokenValidationTest < ActionDispatch::IntegrationTest
   test "renders a successful html validation result" do
     post "/validate", params: { token: @token }
 
-    assert_redirected_to "/validate"
-
-    follow_redirect!
     assert_response :success
     assert_match "Token is valid.", response.body
     assert_match "Decoded Token", response.body
@@ -93,10 +90,7 @@ class TokenValidationTest < ActionDispatch::IntegrationTest
   test "renders an invalid html validation result" do
     post "/validate", params: { token: "not-a-jwt" }
 
-    assert_redirected_to "/validate"
-
-    follow_redirect!
-    assert_response :success
+    assert_response :unauthorized
     assert_match "Invalid token.", response.body
   end
 end

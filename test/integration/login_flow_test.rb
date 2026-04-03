@@ -46,9 +46,6 @@ class LoginFlowTest < ActionDispatch::IntegrationTest
 
     post "/login", params: { email: "user@example.com", password: @password }
 
-    assert_redirected_to "/"
-
-    follow_redirect!
     assert_response :success
     assert_match JwtIssuer.public_key.to_pem, response.body
     assert_match "Login succeeded.", response.body
@@ -74,10 +71,7 @@ class LoginFlowTest < ActionDispatch::IntegrationTest
   test "redirects html login failures back to the home page" do
     post "/login", params: { email: "user@example.com", password: "wrong password" }
 
-    assert_redirected_to "/"
-
-    follow_redirect!
-    assert_response :success
+    assert_response :unprocessable_entity
     assert_match "Invalid email or password.", response.body
   end
 
