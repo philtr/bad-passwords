@@ -7,7 +7,7 @@ Small Rails app for testing a simple SSO flow against a remotely hosted plaintex
 - `POST /register` stores an `email` and `password_hash_url` after proving the submitted plaintext password matches the remote Argon2 hash.
 - `POST /login` fetches the current hash from the stored URL, verifies the password, and returns an RS256-signed JWT.
 - `/` provides a plain HTML test page with registration, login, the JWT public key, and API docs.
-- `/example.txt` returns a plaintext Argon2 hash for `test123`.
+- `/example.txt` returns a cached plaintext Argon2 hash for `test123`.
 
 ## Run It
 
@@ -84,6 +84,7 @@ Failed login returns:
 ## Notes
 
 - The remote hash URL must return only a plaintext Argon2 hash with HTTP 200.
+- Requests are rate-limited per IP and return `429 Too Many Requests` when exceeded.
 - JSON requests skip CSRF protection. HTML form submissions still use normal Rails CSRF protection.
 - The app stores only `email` and `password_hash_url`.
 - If Rails blocks your hostname, add it to the relevant `config.hosts` allowlist.

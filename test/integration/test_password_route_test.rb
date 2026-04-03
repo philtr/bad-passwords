@@ -8,4 +8,16 @@ class TestPasswordRouteTest < ActionDispatch::IntegrationTest
     assert_equal "text/plain; charset=utf-8", response.headers["content-type"]
     assert Argon2::Password.verify_password("test123", response.body)
   end
+
+  test "caches the generated example hash" do
+    Rails.cache.clear
+
+    get "/example.txt"
+    first_hash = response.body
+
+    get "/example.txt"
+    second_hash = response.body
+
+    assert_equal first_hash, second_hash
+  end
 end
