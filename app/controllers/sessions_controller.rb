@@ -14,7 +14,7 @@ class SessionsController < ApplicationController
       password: login_params[:password],
       password_hash_url: user.password_hash_url
     ).call
-    if !verification.success? && verification.message == "Password does not match the remote Argon2 hash."
+    if verification.invalid_credentials?
       return respond_with_login_result(false, INVALID_CREDENTIALS_MESSAGE)
     end
 
