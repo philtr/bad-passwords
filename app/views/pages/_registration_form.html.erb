@@ -1,0 +1,22 @@
+<fieldset>
+  <legend>Register</legend>
+  <%= form_with url: "/register", method: :post, local: true do |form| %>
+    <table>
+      <tr>
+        <td><label for="register_email">Email</label></td>
+        <td><%= form.email_field :email, id: "register_email", value: registration_user.email %></td>
+      </tr>
+      <tr>
+        <td><label for="register_password_hash_url">Password Hash URL</label></td>
+        <td><%= form.url_field :password_hash_url, id: "register_password_hash_url", value: registration_user.password_hash_url %></td>
+      </tr>
+      <tr>
+        <td><label for="register_password">Password</label></td>
+        <td><%= form.password_field :password, id: "register_password" %></td>
+      </tr>
+      <tr>
+        <td colspan="2"><%= form.submit "Register" %></td>
+      </tr>
+    </table>
+  <% end %>
+</fieldset>

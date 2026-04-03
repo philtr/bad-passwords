@@ -1,0 +1,13 @@
+<% if registration_result %>
+  <h2>Registration Result</h2>
+  <table border="1">
+    <tr>
+      <th>Status</th>
+      <td><font color="<%= registration_result[:success] ? success_color : error_color %>"><%= registration_result[:success] ? "success" : "error" %></font></td>
+    </tr>
+    <tr>
+      <th>Message</th>
+      <td><font color="<%= registration_result[:success] ? success_color : error_color %>"><%= registration_result[:message] %></font></td>
+    </tr>
+  </table>
+<% end %>

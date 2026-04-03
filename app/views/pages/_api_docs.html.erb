@@ -1,0 +1,128 @@
+<h2>API Docs</h2>
+
+<p>The API accepts either HTML form posts or JSON requests. For API use, send <code>Accept: application/json</code>. For JSON bodies, also send <code>Content-Type: application/json</code>.</p>
+
+<h3>Environment</h3>
+
+<table border="1">
+  <tr>
+    <th>Setting</th>
+    <th>Details</th>
+  </tr>
+  <tr>
+    <td>JWT_ISSUER</td>
+    <td>Required. Used for the JWT <code>iss</code> claim.</td>
+  </tr>
+</table>
+
+<h3>POST /register</h3>
+
+<table border="1">
+  <tr>
+    <th>Field</th>
+    <th>Required</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>email</td>
+    <td>yes</td>
+    <td>Email address to register. Must be unique.</td>
+  </tr>
+  <tr>
+    <td>password_hash_url</td>
+    <td>yes</td>
+    <td>URL that returns a plaintext Argon2 password hash.</td>
+  </tr>
+  <tr>
+    <td>password</td>
+    <td>yes</td>
+    <td>Plaintext password used to prove the remote hash belongs to the registrant.</td>
+  </tr>
+</table>
+
+<p>Example JSON request:</p>
+
+<pre>{
+  "email": "user@example.com",
+  "password_hash_url": "https://example.com/hash.txt",
+  "password": "correct horse battery staple"
+}</pre>
+
+<p>Successful JSON response:</p>
+
+<pre>{
+  "email": "user@example.com",
+  "password_hash_url": "https://example.com/hash.txt"
+}</pre>
+
+<p>Error JSON response:</p>
+
+<pre>{
+  "error": "Password does not match the remote Argon2 hash."
+}</pre>
+
+<h3>POST /login</h3>
+
+<table border="1">
+  <tr>
+    <th>Field</th>
+    <th>Required</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>email</td>
+    <td>yes</td>
+    <td>Registered email address.</td>
+  </tr>
+  <tr>
+    <td>password</td>
+    <td>yes</td>
+    <td>Plaintext password to verify against the current remote Argon2 hash.</td>
+  </tr>
+</table>
+
+<p>Example JSON request:</p>
+
+<pre>{
+  "email": "user@example.com",
+  "password": "correct horse battery staple"
+}</pre>
+
+<p>Successful JSON response:</p>
+
+<pre>{
+  "token": "JWT_TOKEN_HERE",
+  "token_type": "Bearer",
+  "email": "user@example.com"
+}</pre>
+
+<p>Decoded JWT payload fields:</p>
+
+<table border="1">
+  <tr>
+    <th>Claim</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>sub</td>
+    <td>User email.</td>
+  </tr>
+  <tr>
+    <td>iss</td>
+    <td>Value of <code>JWT_ISSUER</code>.</td>
+  </tr>
+  <tr>
+    <td>iat</td>
+    <td>Issued-at timestamp.</td>
+  </tr>
+  <tr>
+    <td>exp</td>
+    <td>Expiry timestamp, one hour after issue.</td>
+  </tr>
+</table>
+
+<p>Error JSON response:</p>
+
+<pre>{
+  "error": "Invalid email or password."
+}</pre>
