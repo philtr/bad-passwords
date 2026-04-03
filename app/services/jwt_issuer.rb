@@ -1,6 +1,5 @@
 class JwtIssuer
   TTL = 1.hour
-  DEFAULT_ISSUER = "bad-passwords-local".freeze
 
   def initialize(user:)
     @user = user
@@ -16,11 +15,11 @@ class JwtIssuer
   end
 
   def self.private_key
-    @private_key ||= OpenSSL::PKey::RSA.new(normalized_key(ENV.fetch("JWT_PRIVATE_KEY")))
+    @private_key ||= OpenSSL::PKey::RSA.new(normalized_key(private_key_pem))
   end
 
   def self.public_key
-    @public_key ||= OpenSSL::PKey::RSA.new(normalized_key(ENV.fetch("JWT_PUBLIC_KEY")))
+    @public_key ||= OpenSSL::PKey::RSA.new(normalized_key(public_key_pem))
   end
 
   def self.reset_keys!
@@ -32,6 +31,14 @@ class JwtIssuer
     key.gsub("\\n", "\n")
   end
 
+  def self.private_key_pem
+    Rails.configuration.x.jwt.private_key.presence || raise(KeyError, 'key not found: "JWT_PRIVATE_KEY"')
+  end
+
+  def self.public_key_pem
+    Rails.configuration.x.jwt.public_key.presence || raise(KeyError, 'key not found: "JWT_PUBLIC_KEY"')
+  end
+
   private
 
   attr_reader :user
@@ -41,7 +48,7 @@ class JwtIssuer
 
     {
       "sub" => user.email,
-      "iss" => ENV.fetch("JWT_ISSUER", DEFAULT_ISSUER),
+      "iss" => Rails.configuration.x.jwt.issuer,
       "iat" => issued_at,
       "exp" => issued_at + TTL.to_i
     }

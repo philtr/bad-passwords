@@ -26,6 +26,8 @@ export JWT_PUBLIC_KEY="$(cat path/to/jwt_public.pem)"
 ```
 
 `JWT_ISSUER` is optional for local development. If omitted, the app uses `bad-passwords-local`.
+`JWT_PRIVATE_KEY` and `JWT_PUBLIC_KEY` are optional in development and test because those environments configure a fixed local keypair. Set them explicitly in production.
+`JWT_ISSUER` is also configured in development and test, and only needs to be set explicitly outside those environments.
 
 Then start the server:
 

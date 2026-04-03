@@ -47,4 +47,50 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
+
+  config.x.jwt.private_key = ENV.fetch("JWT_PRIVATE_KEY") do
+    <<~PEM
+      -----BEGIN RSA PRIVATE KEY-----
+      MIIEowIBAAKCAQEAjtDYXk8RZXEYxkHVEq7Xno1/l345+Zr4uWN5EVbHnojg0zaV
+      84nQeiokssnZtqVB2eDAX9CLgy2c3YtVUKfp1D0kSzvKtYRglw0edEm6ETHBcHde
+      82RriYRfKX5fnv1Gt8ktzAdZgKRZtPAiZK3JCkKQpbqoS84k6R5ivLl7bvlBUDH8
+      00JSJlEQSoZ8BalQ3smbRT22sW6WdNonGihJGtd93oBUgPEsIxtDRe6XBBJzy038
+      8F93BTk80twW2d4U8L45qdus4UqSP0eYrupXB8qsrY5SSz0LGJZgz5p0vP8l48y0
+      A+ib70GecC5nxk0MLgZjmUgf9f2qC37gG0D2mQIDAQABAoIBAADalyM/4MWU/rDC
+      GFaIwhRExKRbZlhWM1zUZJcUculr6GrgMtb7wMnXh6mj/aUTFDOLyEqqXLMs6iOu
+      9L8gieGGzg6UbcVWZHIda3cG29HE1OMUa6ET6CAF28B2l3bEDTtbEhGGt7kbrRz2
+      VJZP2FmzL9ngevzHtOkfO+LkpFbJAhrLr3wcOZ0Lq3QtrctHe/QIFJz22KQkuqWD
+      QLvZPJUHdUggJty064m3EW5U9Ew8FaMJJDdRniSFrCquOsZDM4eHTERbE8ETj+/9
+      STGQKZsFeCKPMVEE7+etAG7hbPtkOBlMRKXdnP43ZhebsfP92Xamblej0Ia5v5IY
+      xS/LMkECgYEAv9AWH4+cKZ63ARQd9zJ7+5orMjYhxK8mNPwY01yCmYhp8vYNE0zB
+      j+goOd/kTozq6qL9hAheCRuSDuk0n/eLOKcAvZTalS1Nk7/MZG/oEEV2l5+sV3Tz
+      3zP6I95Me/TGIXNI2DO4SnAMPeby0t8SZIV+EHZHgAJPklJj/56T70kCgYEAvptc
+      CPQhmiSLd/Rxdz21E2EgOK7Ep9yVLSfOjzy9r9V6TCH8ymN6Qfst9aVhT2t4ojuD
+      0AtJGqEk7r5iPWU5oAfdocQzb82ygSHMiLv/4SdUToeEMqr/8CXJku8AUHLwgMfS
+      nxL8QJ8TM6s8hYli3Vden/dz8IEOs8EoaW25vNECgYBBFTz8doD5SkY0EnxcbP/O
+      jjAL+HwavYdMQSG3TdNufu/cJYqoOsoOpypHAOX5lSz8clNs4l3t3zH+5zgY8yiF
+      D31b1k8YgOeqs1CJ38KxCrDDn8UdY6x/1qYQV5RCFvrHTNOxsFLexwgQVPWdgV0/
+      SGBO+6MlFyOitVwC1u7BKQKBgGCuOP6ppimjg8KykKMk/6X2y/s0WreyYVBoMpPh
+      AW4g4Emhq7GUx7yUBXnmCvfX0XaorXFnaAtD1ZHrq7TslVAg7UBSXqzFL1fkpvRs
+      N5wi8NZsUpfIuM08vYP0CrrDsk4ADUt2u9CjX4ADyU0KpMUUvgBx6bMCI0z2GuNv
+      LpkhAoGBAJ+H1vV6QKTKCJrk9+21mSmHyUWrjNG9UGdK+EaLnuJdC1sxYDNt1Mg4
+      OiLX1CSRJuF7VsOwA1kzDgBRP3nOCcFF0MkI+5xOznW6nAS4TYDsrgRatC0EY1Sz
+      bk2aB8rVviRMlVIkqKZCWCDmyxRyDwlNznDvYxzIzAIwPKqzUFUG
+      -----END RSA PRIVATE KEY-----
+    PEM
+  end
+  config.x.jwt.public_key = ENV.fetch("JWT_PUBLIC_KEY") do
+    <<~PEM
+      -----BEGIN PUBLIC KEY-----
+      MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjtDYXk8RZXEYxkHVEq7X
+      no1/l345+Zr4uWN5EVbHnojg0zaV84nQeiokssnZtqVB2eDAX9CLgy2c3YtVUKfp
+      1D0kSzvKtYRglw0edEm6ETHBcHde82RriYRfKX5fnv1Gt8ktzAdZgKRZtPAiZK3J
+      CkKQpbqoS84k6R5ivLl7bvlBUDH800JSJlEQSoZ8BalQ3smbRT22sW6WdNonGihJ
+      Gtd93oBUgPEsIxtDRe6XBBJzy0388F93BTk80twW2d4U8L45qdus4UqSP0eYrupX
+      B8qsrY5SSz0LGJZgz5p0vP8l48y0A+ib70GecC5nxk0MLgZjmUgf9f2qC37gG0D2
+      mQIDAQAB
+      -----END PUBLIC KEY-----
+    PEM
+  end
+  config.x.jwt.issuer = ENV.fetch("JWT_ISSUER") { "bad-passwords-local" }
 end

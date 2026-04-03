@@ -3,10 +3,8 @@ require "test_helper"
 class RateLimitingTest < ActionDispatch::IntegrationTest
   setup do
     Rails.cache.clear
-    ENV["JWT_ISSUER"] = "bad-passwords-test"
-    keypair = OpenSSL::PKey::RSA.generate(2048)
-    ENV["JWT_PRIVATE_KEY"] = keypair.to_pem
-    ENV["JWT_PUBLIC_KEY"] = keypair.public_key.to_pem
+    Rails.configuration.x.jwt.issuer = "bad-passwords-test"
+    JwtIssuer.reset_keys!
 
     password = "test123"
     password_hash = Argon2::Password.create(password)

@@ -2,10 +2,7 @@ require "test_helper"
 
 class LoginFlowTest < ActionDispatch::IntegrationTest
   setup do
-    ENV["JWT_ISSUER"] = "bad-passwords-test"
-    keypair = OpenSSL::PKey::RSA.generate(2048)
-    ENV["JWT_PRIVATE_KEY"] = keypair.to_pem
-    ENV["JWT_PUBLIC_KEY"] = keypair.public_key.to_pem
+    Rails.configuration.x.jwt.issuer = "bad-passwords-local"
     JwtIssuer.reset_keys!
     @password = "correct horse battery staple"
     @hash = Argon2::Password.create(@password)
@@ -16,6 +13,8 @@ class LoginFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "returns JSON token data for a successful login" do
+    Rails.configuration.x.jwt.issuer = "bad-passwords-test"
+
     post "/login", params: { email: "user@example.com", password: @password }, as: :json
 
     assert_response :success
@@ -30,8 +29,8 @@ class LoginFlowTest < ActionDispatch::IntegrationTest
     assert_operator payload["exp"], :>, payload["iat"]
   end
 
-  test "uses the default issuer when JWT_ISSUER is unset" do
-    ENV.delete("JWT_ISSUER")
+  test "uses the default issuer from test environment config" do
+    assert_equal "bad-passwords-local", Rails.configuration.x.jwt.issuer
 
     post "/login", params: { email: "user@example.com", password: @password }, as: :json
 
@@ -42,13 +41,15 @@ class LoginFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "renders the HTML result page with token details" do
+    Rails.configuration.x.jwt.issuer = "bad-passwords-test"
+
     post "/login", params: { email: "user@example.com", password: @password }
 
     assert_redirected_to "/"
 
     follow_redirect!
     assert_response :success
-    assert_match ENV["JWT_PUBLIC_KEY"], response.body
+    assert_match JwtIssuer.public_key.to_pem, response.body
     assert_match "Login succeeded.", response.body
     assert_match "Decoded Token", response.body
     assert_match "user@example.com", response.body

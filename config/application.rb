@@ -38,5 +38,9 @@ module BadPasswords
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
+    config.x.jwt.private_key = ENV.fetch("JWT_PRIVATE_KEY", nil)
+    config.x.jwt.public_key = ENV.fetch("JWT_PUBLIC_KEY", nil)
+    config.x.jwt.issuer = ENV.fetch("JWT_ISSUER", nil)
   end
 end
