@@ -2,6 +2,33 @@
 
 <p>The API accepts either HTML form posts or JSON requests. For API use, send <code>Accept: application/json</code>. For JSON bodies, also send <code>Content-Type: application/json</code>.</p>
 
+<h3 id="contents">Contents</h3>
+
+<table border="1">
+  <tr>
+    <th>Endpoint</th>
+    <th>Summary</th>
+  </tr>
+  <tr>
+    <td><a href="#register">POST /register</a></td>
+    <td>Register a user after proving the supplied password matches the remote Argon2 hash.</td>
+  </tr>
+  <tr>
+    <td><a href="#login">POST /login</a></td>
+    <td>Verify a password against the current remote hash and issue an RS256-signed JWT.</td>
+  </tr>
+  <tr>
+    <td><a href="#validate">POST /validate</a></td>
+    <td>Validate a JWT signature and return the decoded payload when the token is valid.</td>
+  </tr>
+  <tr>
+    <td><a href="#logout">DELETE /logout</a></td>
+    <td>Rotate the user's token version to invalidate previously issued tokens.</td>
+  </tr>
+</table>
+
+<hr>
+
 <h3 id="register">POST /register</h3>
 
 <table border="1">
@@ -47,6 +74,10 @@
 <pre>{
   "error": "Could not verify the password hash URL."
 }</pre>
+
+<p><a href="#contents">Back to contents</a></p>
+
+<hr>
 
 <h3 id="login">POST /login</h3>
 
@@ -118,6 +149,10 @@
   "error": "Invalid email or password."
 }</pre>
 
+<p><a href="#contents">Back to contents</a></p>
+
+<hr>
+
 <h3 id="validate">POST /validate</h3>
 
 <p>Provide the JWT either as a JSON <code>token</code> field or in the <code>Authorization: Bearer &lt;token&gt;</code> header.</p>
@@ -160,6 +195,10 @@
   "error": "Invalid token."
 }</pre>
 
+<p><a href="#contents">Back to contents</a></p>
+
+<hr>
+
 <h3 id="logout">DELETE /logout</h3>
 
 <p>Authenticate either with a valid Bearer token or with JSON credentials. Successful logout rotates the user's token version, invalidating all previously issued tokens.</p>
@@ -201,3 +240,5 @@
 <pre>{
   "error": "Invalid token or credentials."
 }</pre>
+
+<p><a href="#contents">Back to contents</a></p>

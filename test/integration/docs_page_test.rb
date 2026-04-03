@@ -10,6 +10,11 @@ class DocsPageTest < ActionDispatch::IntegrationTest
     assert_match 'aria-current="page">Docs</span>', response.body
     assert_match 'href="/validate">Validate</a>', response.body
     assert_match "API Docs", response.body
+    assert_match "Contents", response.body
+    assert_match 'href="#register"', response.body
+    assert_match 'href="#login"', response.body
+    assert_match 'href="#validate"', response.body
+    assert_match 'href="#logout"', response.body
     assert_match "POST /register", response.body
     assert_match "POST /login", response.body
     assert_match "POST /validate", response.body
