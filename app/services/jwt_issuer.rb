@@ -49,6 +49,7 @@ class JwtIssuer
     {
       "sub" => user.email,
       "iss" => Rails.configuration.x.jwt.issuer,
+      "ver" => user.current_token_version,
       "iat" => issued_at,
       "exp" => issued_at + TTL.to_i
     }

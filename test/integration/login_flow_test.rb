@@ -26,6 +26,7 @@ class LoginFlowTest < ActionDispatch::IntegrationTest
     payload = JwtIssuer.decode(body["token"])
     assert_equal "user@example.com", payload["sub"]
     assert_equal "bad-passwords-test", payload["iss"]
+    assert_equal User.find_by(email: "user@example.com").current_token_version, payload["ver"]
     assert_operator payload["exp"], :>, payload["iat"]
   end
 
@@ -78,6 +79,20 @@ class LoginFlowTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_response :success
     assert_match "Invalid email or password.", response.body
+  end
+
+  test "rotates token version from the html login fieldset flow" do
+    old_version = User.find_by(email: "user@example.com").current_token_version
+
+    delete "/logout", params: { email: "user@example.com", password: @password }
+
+    assert_redirected_to "/"
+
+    follow_redirect!
+    assert_response :success
+    assert_match "Logout succeeded. Existing tokens revoked.", response.body
+
+    assert_not_equal old_version, User.find_by(email: "user@example.com").current_token_version
   end
 
   test "rejects unreachable remote hashes" do

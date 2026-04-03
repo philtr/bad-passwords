@@ -8,4 +8,5 @@ Rails.application.routes.draw do
   post "/register", to: "registrations#create"
   post "/login", to: "sessions#create"
   post "/validate", to: "tokens#validate"
+  delete "/logout", to: "sessions#destroy"
 end

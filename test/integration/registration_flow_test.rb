@@ -17,6 +17,7 @@ class RegistrationFlowTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_response :success
     assert_equal "user@example.com", User.last.email
+    assert_match(/\A[a-z0-9]{16}\z/, User.last.current_token_version)
     assert_match "Registration succeeded.", response.body
   end
 

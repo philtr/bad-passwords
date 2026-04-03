@@ -10,9 +10,9 @@ class TokensController < ApplicationController
     token = bearer_token || token_param
     return respond_with_invalid_token unless token.present?
 
-    payload = JwtIssuer.decode(token)
+    result = TokenValidator.call(token)
 
-    respond_with_validation_result(payload)
+    respond_with_validation_result(result.payload)
   rescue JWT::DecodeError
     respond_with_invalid_token
   end

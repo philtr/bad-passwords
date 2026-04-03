@@ -2,7 +2,7 @@
 
 <p>The API accepts either HTML form posts or JSON requests. For API use, send <code>Accept: application/json</code>. For JSON bodies, also send <code>Content-Type: application/json</code>.</p>
 
-<h3>POST /register</h3>
+<h3 id="register">POST /register</h3>
 
 <table border="1">
   <tr>
@@ -48,7 +48,7 @@
   "error": "Password does not match the remote Argon2 hash."
 }</pre>
 
-<h3>POST /login</h3>
+<h3 id="login">POST /login</h3>
 
 <table border="1">
   <tr>
@@ -103,6 +103,10 @@
     <td>Issued-at timestamp.</td>
   </tr>
   <tr>
+    <td>ver</td>
+    <td>Current per-user token version.</td>
+  </tr>
+  <tr>
     <td>exp</td>
     <td>Expiry timestamp, one hour after issue.</td>
   </tr>
@@ -114,7 +118,7 @@
   "error": "Invalid email or password."
 }</pre>
 
-<h3>POST /validate</h3>
+<h3 id="validate">POST /validate</h3>
 
 <p>Provide the JWT either as a JSON <code>token</code> field or in the <code>Authorization: Bearer &lt;token&gt;</code> header.</p>
 
@@ -154,4 +158,46 @@
 <pre>{
   "valid": false,
   "error": "Invalid token."
+}</pre>
+
+<h3 id="logout">DELETE /logout</h3>
+
+<p>Authenticate either with a valid Bearer token or with JSON credentials. Successful logout rotates the user's token version, invalidating all previously issued tokens.</p>
+
+<table border="1">
+  <tr>
+    <th>Field</th>
+    <th>Required</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>username or email</td>
+    <td>yes, unless sent as Bearer token</td>
+    <td>Registered email address for credential-based logout.</td>
+  </tr>
+  <tr>
+    <td>password</td>
+    <td>yes, unless sent as Bearer token</td>
+    <td>Plaintext password to verify before rotating the token version.</td>
+  </tr>
+</table>
+
+<p>Example JSON request:</p>
+
+<pre>{
+  "username": "user@example.com",
+  "password": "correct horse battery staple"
+}</pre>
+
+<p>Successful JSON response:</p>
+
+<pre>{
+  "success": true,
+  "email": "user@example.com"
+}</pre>
+
+<p>Error JSON response:</p>
+
+<pre>{
+  "error": "Invalid token or credentials."
 }</pre>

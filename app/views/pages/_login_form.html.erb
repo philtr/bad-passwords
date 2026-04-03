@@ -1,5 +1,5 @@
 <fieldset>
-  <legend>Login Test</legend>
+  <legend>Login</legend>
   <%= form_with url: "/login", method: :post, local: true do |form| %>
     <table>
       <tr>
@@ -11,7 +11,12 @@
         <td><%= form.password_field :password, id: "login_password" %></td>
       </tr>
       <tr>
-        <td colspan="2"><%= form.submit "Test Login" %></td>
+        <td colspan="2">
+          <%= form.submit "Login" %>
+          <%= form.button "Logout", formaction: "/logout", formmethod: :post, name: "_method", value: "delete" %>
+          <br>
+          <small>Logout invalidates all existing tokens (<a href="/docs#logout">docs</a>)</small>
+        </td>
       </tr>
     </table>
   <% end %>

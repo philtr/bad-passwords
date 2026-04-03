@@ -18,6 +18,7 @@ class TokenValidationTest < ActionDispatch::IntegrationTest
     assert_equal true, body["valid"]
     assert_equal "user@example.com", body.dig("payload", "sub")
     assert_equal "bad-passwords-test", body.dig("payload", "iss")
+    assert_equal @user.current_token_version, body.dig("payload", "ver")
   end
 
   test "validates a token from the authorization header" do
@@ -49,6 +50,15 @@ class TokenValidationTest < ActionDispatch::IntegrationTest
 
   test "rejects an invalid token" do
     post "/validate", params: { token: "not-a-jwt" }, as: :json
+
+    assert_response :unauthorized
+    assert_equal({ "valid" => false, "error" => "Invalid token." }, JSON.parse(response.body))
+  end
+
+  test "rejects a token with a stale version" do
+    @user.rotate_token_version!
+
+    post "/validate", params: { token: @token }, as: :json
 
     assert_response :unauthorized
     assert_equal({ "valid" => false, "error" => "Invalid token." }, JSON.parse(response.body))

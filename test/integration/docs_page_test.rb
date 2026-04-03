@@ -10,6 +10,7 @@ class DocsPageTest < ActionDispatch::IntegrationTest
     assert_match "POST /register", response.body
     assert_match "POST /login", response.body
     assert_match "POST /validate", response.body
+    assert_match "DELETE /logout", response.body
   end
 
   test "links to the docs page from the home page" do
