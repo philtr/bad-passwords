@@ -101,7 +101,7 @@ class LoginFlowTest < ActionDispatch::IntegrationTest
     post "/login", params: { email: "user@example.com", password: @password }, as: :json
 
     assert_response :unprocessable_entity
-    assert_equal "Could not fetch password hash URL.", JSON.parse(response.body)["error"]
+    assert_equal "Could not verify the password hash URL.", JSON.parse(response.body)["error"]
   end
 
   test "rejects invalid remote hash content" do
@@ -110,6 +110,6 @@ class LoginFlowTest < ActionDispatch::IntegrationTest
     post "/login", params: { email: "user@example.com", password: @password }, as: :json
 
     assert_response :unprocessable_entity
-    assert_equal "Password hash URL did not return an Argon2 hash.", JSON.parse(response.body)["error"]
+    assert_equal "Could not verify the password hash URL.", JSON.parse(response.body)["error"]
   end
 end

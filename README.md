@@ -99,6 +99,12 @@ Failed login returns:
 { "error": "Invalid email or password." }
 ```
 
+Remote hash verification failures return:
+
+```json
+{ "error": "Could not verify the password hash URL." }
+```
+
 Successful token validation returns:
 
 ```json

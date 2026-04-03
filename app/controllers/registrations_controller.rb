@@ -1,4 +1,6 @@
 class RegistrationsController < ApplicationController
+  PASSWORD_HASH_VERIFICATION_ERROR_MESSAGE = "Could not verify the password hash URL.".freeze
+
   def create
     @registration_user = User.new(registration_params.except(:password))
     @login_email = ""
@@ -18,7 +20,7 @@ class RegistrationsController < ApplicationController
     else
       @registration_result = {
         success: false,
-        message: verification.success? ? @registration_user.errors.full_messages.to_sentence : verification.message
+        message: verification.success? ? @registration_user.errors.full_messages.to_sentence : registration_error_message(verification)
       }
     end
 
@@ -41,5 +43,16 @@ class RegistrationsController < ApplicationController
 
   def registration_params
     params.permit(:email, :password_hash_url, :password)
+  end
+
+  def registration_error_message(verification)
+    return verification.message unless infrastructure_verification_error?(verification)
+
+    Rails.logger.warn("Password hash verification failed during registration: #{verification.message}")
+    PASSWORD_HASH_VERIFICATION_ERROR_MESSAGE
+  end
+
+  def infrastructure_verification_error?(verification)
+    verification.status.in?([ :fetch_error, :invalid_hash, :invalid_url ])
   end
 end

@@ -2,6 +2,7 @@ class SessionsController < ApplicationController
   INVALID_CREDENTIALS_MESSAGE = "Invalid email or password.".freeze
   INVALID_TOKEN_MESSAGE = "Invalid token.".freeze
   INVALID_LOGOUT_MESSAGE = "Invalid token or credentials.".freeze
+  PASSWORD_HASH_VERIFICATION_ERROR_MESSAGE = "Could not verify the password hash URL.".freeze
 
   def create
     @registration_user = User.new
@@ -20,7 +21,7 @@ class SessionsController < ApplicationController
       return respond_with_login_result(false, INVALID_CREDENTIALS_MESSAGE)
     end
 
-    return respond_with_login_result(false, verification.message) unless verification.success?
+    return respond_with_login_result(false, login_error_message(verification)) unless verification.success?
 
     token = JwtIssuer.new(user: user).call
     decoded_token = JwtIssuer.decode(token)
@@ -93,6 +94,8 @@ class SessionsController < ApplicationController
       password_hash_url: user.password_hash_url
     ).call
 
+    log_password_hash_verification_failure("logout", verification) if infrastructure_verification_error?(verification)
+
     verification.success? ? user : nil
   end
 
@@ -124,5 +127,20 @@ class SessionsController < ApplicationController
       end
       format.json { render json: { error: message }, status: :unprocessable_entity }
     end
+  end
+
+  def login_error_message(verification)
+    return verification.message unless infrastructure_verification_error?(verification)
+
+    log_password_hash_verification_failure("login", verification)
+    PASSWORD_HASH_VERIFICATION_ERROR_MESSAGE
+  end
+
+  def infrastructure_verification_error?(verification)
+    verification.status.in?([ :fetch_error, :invalid_hash, :invalid_url ])
+  end
+
+  def log_password_hash_verification_failure(context, verification)
+    Rails.logger.warn("Password hash verification failed during #{context}: #{verification.message}")
   end
 end

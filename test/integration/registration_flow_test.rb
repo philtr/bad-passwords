@@ -59,7 +59,7 @@ class RegistrationFlowTest < ActionDispatch::IntegrationTest
 
     follow_redirect!
     assert_response :success
-    assert_match "Could not fetch password hash URL.", response.body
+    assert_match "Could not verify the password hash URL.", response.body
   end
 
   test "rejects invalid remote hash content" do
@@ -69,7 +69,7 @@ class RegistrationFlowTest < ActionDispatch::IntegrationTest
 
     follow_redirect!
     assert_response :success
-    assert_match "did not return an Argon2 hash", response.body
+    assert_match "Could not verify the password hash URL.", response.body
   end
 
   test "rejects a password that does not match the remote hash" do
