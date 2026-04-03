@@ -1,1 +1,26 @@
 /* Application styles */
+
+body {
+  margin: 0;
+  padding: 1.5rem;
+}
+
+.site-nav {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.site-logo {
+  display: block;
+  height: auto;
+  max-width: min(100%, 18rem);
+}
+
+.site-nav-links {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}

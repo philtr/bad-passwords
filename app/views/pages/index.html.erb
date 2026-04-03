@@ -1,9 +1,14 @@
 <% content_for :title, "Bad Passwords" %>
+<% content_for :meta_description, "Bad Passwords handles delegated password verification with remote Argon2 hashes, JWT issuance, and browser-based testing tools." %>
 
 <% success_color = "#006400" %>
 <% error_color = "#8b0000" %>
 
 <%= render "pages/navigation" %>
+
+<p>
+  <%= image_tag "badpasswords.png", alt: "Bad Passwords", class: "site-logo" %>
+</p>
 
 <h1>Bad Passwords</h1>
 

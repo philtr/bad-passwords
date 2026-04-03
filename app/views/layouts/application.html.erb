@@ -1,8 +1,21 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Bad Passwords" %></title>
+    <title><%= page_title %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="<%= page_description %>">
+    <link rel="canonical" href="<%= canonical_url %>">
+    <meta property="og:site_name" content="Bad Passwords">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="<%= page_title %>">
+    <meta property="og:description" content="<%= page_description %>">
+    <meta property="og:url" content="<%= canonical_url %>">
+    <meta property="og:image" content="<%= social_image_url %>">
+    <meta property="og:image:alt" content="Bad Passwords application icon">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="<%= page_title %>">
+    <meta name="twitter:description" content="<%= page_description %>">
+    <meta name="twitter:image" content="<%= social_image_url %>">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <style>
