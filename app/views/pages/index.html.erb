@@ -7,7 +7,7 @@
 
 <h1>Bad Passwords</h1>
 
-<p>Bad Passwords is a small reference app for delegated password verification. It stores an email address and a URL for that user's Argon2 password hash instead of storing the hash locally.</p>
+<p>Bad Passwords handles delegated password verification. It stores an email address and a URL for that user's Argon2 password hash instead of storing the hash locally.</p>
 
 <p>When someone logs in, the application fetches the current hash from that remote URL, verifies the submitted password against it, and issues a signed JWT if the check succeeds. The home page lets you register a user, exercise the login flow, and inspect the current public key used for token verification.</p>
 
