@@ -4,140 +4,38 @@ Small Rails app for testing a simple SSO flow against a remotely hosted plaintex
 
 ## What It Does
 
-1. Register a user with:
-   - `email`
-   - `password_hash_url`
-   - plaintext `password`
-2. On registration, the app fetches the remote hash and verifies the submitted password matches it.
-3. On login, the app fetches the current hash from the stored URL and verifies the submitted password again.
-4. If login succeeds, the app returns a signed JWT.
+- `POST /register` stores an `email` and `password_hash_url` after proving the submitted plaintext password matches the remote Argon2 hash.
+- `POST /login` fetches the current hash from the stored URL, verifies the password, and returns an RS256-signed JWT.
+- `/` provides a plain HTML test page with registration, login, the JWT public key, and API docs.
+- `/example.txt` returns a plaintext Argon2 hash for `test123`.
 
-The app supports:
-
-- bare HTML forms at `/`
-- JSON API requests to `POST /register` and `POST /login`
-- a login test page that shows the token and decoded token payload
-
-## Requirements
-
-- Ruby 4.x
-- Rails 8.x
-- SQLite
-
-## Setup
-
-Install dependencies:
+## Run It
 
 ```bash
 bundle install
-```
-
-Prepare the database:
-
-```bash
 bin/rails db:prepare
+ruby script/generate_jwt_keypair
 ```
 
-Set the JWT issuer:
+Set these env vars:
 
 ```bash
 export JWT_ISSUER=bad-passwords-dev
-```
-
-Set the JWT signing keypair:
-
-```bash
 export JWT_PRIVATE_KEY="$(cat path/to/jwt_private.pem)"
 export JWT_PUBLIC_KEY="$(cat path/to/jwt_public.pem)"
 ```
 
-Start the server:
+Then start the server:
 
 ```bash
 bin/rails server
 ```
 
-Then open:
-
-- [http://127.0.0.1:3000](http://127.0.0.1:3000)
-
-## HTML UI
-
-The home page provides:
-
-- a registration form
-- a login test form
-- result tables for success and failure
-- API docs below the forms
-
-Layout is plain HTML with tables. There is no CSS layout system.
+Open [http://127.0.0.1:3000](http://127.0.0.1:3000).
 
 ## JSON API
 
-For JSON requests, send:
-
-- `Content-Type: application/json`
-- `Accept: application/json`
-
-### `POST /register`
-
-Request body:
-
-```json
-{
-  "email": "user@example.com",
-  "password_hash_url": "https://example.com/hash.txt",
-  "password": "correct horse battery staple"
-}
-```
-
-Successful response:
-
-```json
-{
-  "email": "user@example.com",
-  "password_hash_url": "https://example.com/hash.txt"
-}
-```
-
-Error response:
-
-```json
-{
-  "error": "Password does not match the remote Argon2 hash."
-}
-```
-
-### `POST /login`
-
-Request body:
-
-```json
-{
-  "email": "user@example.com",
-  "password": "correct horse battery staple"
-}
-```
-
-Successful response:
-
-```json
-{
-  "token": "JWT_TOKEN_HERE",
-  "token_type": "Bearer",
-  "email": "user@example.com"
-}
-```
-
-Error response:
-
-```json
-{
-  "error": "Invalid email or password."
-}
-```
-
-## Curl Examples
+Send `Content-Type: application/json` and `Accept: application/json`.
 
 Register:
 
@@ -147,8 +45,8 @@ curl -i http://127.0.0.1:3000/register \
   -H 'Accept: application/json' \
   -d '{
     "email": "user@example.com",
-    "password_hash_url": "https://example.com/hash.txt",
-    "password": "correct horse battery staple"
+    "password_hash_url": "http://127.0.0.1:3000/example.txt",
+    "password": "test123"
   }'
 ```
 
@@ -160,67 +58,38 @@ curl -i http://127.0.0.1:3000/login \
   -H 'Accept: application/json' \
   -d '{
     "email": "user@example.com",
-    "password": "correct horse battery staple"
+    "password": "test123"
   }'
 ```
 
-## JWT
+Successful login returns JSON with:
 
-Successful login returns an RS256-signed JWT using the keypair from `JWT_PRIVATE_KEY` and `JWT_PUBLIC_KEY`.
+- `token`
+- `token_type`
+- `email`
 
-Claims:
+The JWT contains:
 
 - `sub`
 - `iss`
 - `iat`
 - `exp`
 
-`exp` is one hour after issue time.
+Failed login returns:
 
-## Remote Hash Requirements
-
-The value at `password_hash_url` must:
-
-- be reachable by the Rails app
-- return HTTP 200
-- return only the plaintext Argon2 hash in the response body
-
-If the URL is unreachable, invalid, or returns non-Argon2 content, registration and login fail.
-
-## Host Authorization
-
-If you expose the app on a custom hostname in development or production, Rails may block it with:
-
-```text
-Blocked hosts: your-hostname
-```
-
-Allow the hostname in the relevant environment file, for example:
-
-```ruby
-config.hosts << "your-app.example.com"
-```
-
-Or allow a subdomain pattern:
-
-```ruby
-config.hosts << /.*\.example\.com/
-```
-
-Restart the server after changing host authorization.
-
-## Running Tests
-
-Run the test suite with:
-
-```bash
-JWT_ISSUER=bad-passwords-test bin/rails test
+```json
+{ "error": "Invalid email or password." }
 ```
 
 ## Notes
 
-- JSON requests are exempt from CSRF verification.
-- HTML form submissions still use standard Rails CSRF protection.
+- The remote hash URL must return only a plaintext Argon2 hash with HTTP 200.
+- JSON requests skip CSRF protection. HTML form submissions still use normal Rails CSRF protection.
 - The app stores only `email` and `password_hash_url`.
-- The app does not store plaintext passwords or local password digests.
-- Unknown email and wrong password return the same login error message to reduce account enumeration risk.
+- If Rails blocks your hostname, add it to the relevant `config.hosts` allowlist.
+
+## Test
+
+```bash
+JWT_ISSUER=bad-passwords-test bin/rails test
+```
