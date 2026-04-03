@@ -6,6 +6,9 @@ class DocsPageTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_match "Bad Passwords Docs", response.body
+    assert_match 'href="/">Home</a>', response.body
+    assert_match 'aria-current="page">Docs</span>', response.body
+    assert_match 'href="/validate">Validate</a>', response.body
     assert_match "API Docs", response.body
     assert_match "POST /register", response.body
     assert_match "POST /login", response.body
@@ -17,6 +20,9 @@ class DocsPageTest < ActionDispatch::IntegrationTest
     get "/"
 
     assert_response :success
+    assert_match "Bad Passwords is a small reference app for delegated password verification.", response.body
+    assert_match "Your password hash URL should return the plaintext Argon2 hash", response.body
+    assert_match 'aria-current="page">Home</span>', response.body
     assert_match 'href="/docs"', response.body
     assert_match 'href="/validate"', response.body
   end

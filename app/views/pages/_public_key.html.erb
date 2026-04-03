@@ -1,3 +1,5 @@
 <h2>JWT Public Key</h2>
 
+<p>To validate a JWT locally, save this public key to a PEM file and verify the token signature with any RS256-aware JWT tool. For example, with Ruby: <code>JWT.decode(token, OpenSSL::PKey::RSA.new(File.read("jwt_public_key.pem")), true, { algorithm: "RS256" })</code>. You can also paste the token and public key into <a href="https://jwt.io">jwt.io</a> to decode it and check the signature.</p>
+
 <pre><%= jwt_public_key %></pre>

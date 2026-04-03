@@ -1,0 +1,17 @@
+<nav aria-label="Primary">
+  <% nav_items = [
+    [ "Home", "/" ],
+    [ "Docs", "/docs" ],
+    [ "Validate", "/validate" ]
+  ] %>
+  <% nav_items.each_with_index do |(label, path), index| %>
+    <% if current_page?(path) %>
+      <span aria-current="page"><%= label %></span>
+    <% else %>
+      <a href="<%= path %>"><%= label %></a>
+    <% end %>
+    <% unless index == nav_items.length - 1 %>
+      |
+    <% end %>
+  <% end %>
+</nav>

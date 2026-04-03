@@ -3,9 +3,13 @@
 <% success_color = "#006400" %>
 <% error_color = "#8b0000" %>
 
+<%= render "pages/navigation" %>
+
 <h1>Bad Passwords</h1>
 
-<p>Register an email address with a URL that serves a plaintext Argon2 password hash, then test login against the current remote hash.</p>
+<p>Bad Passwords is a small reference app for delegated password verification. It stores an email address and a URL for that user's Argon2 password hash instead of storing the hash locally.</p>
+
+<p>When someone logs in, the application fetches the current hash from that remote URL, verifies the submitted password against it, and issues a signed JWT if the check succeeds. The home page lets you register a user, exercise the login flow, and inspect the current public key used for token verification.</p>
 
 <%= render "pages/forms", registration_user: @registration_user, login_email: @login_email %>
 <%= render "pages/registration_result", registration_result: @registration_result, success_color:, error_color: %>
@@ -13,8 +17,4 @@
 
 <hr>
 
-<p>
-  <a href="/docs">API Docs</a> |
-  <a href="/validate">Validate Token</a>
-</p>
-<%= render "pages/public_key", jwt_public_key: @jwt_public_key %>
+<%= render "pages/navigation" %>

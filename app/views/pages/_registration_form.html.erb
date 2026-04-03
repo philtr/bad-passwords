@@ -1,5 +1,6 @@
 <fieldset>
   <legend>Register</legend>
+  <p style="max-width: 30rem;">Your password hash URL should return the plaintext Argon2 hash for this account, such as a private endpoint or static text file whose response body is only the hash string.</p>
   <%= form_with url: "/register", method: :post, local: true do |form| %>
     <table>
       <tr>
