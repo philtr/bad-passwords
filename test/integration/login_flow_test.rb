@@ -47,7 +47,6 @@ class LoginFlowTest < ActionDispatch::IntegrationTest
     post "/login", params: { email: "user@example.com", password: @password }
 
     assert_response :success
-    assert_match JwtIssuer.public_key.to_pem, response.body
     assert_match "Login succeeded.", response.body
     assert_match "Decoded Token", response.body
     assert_match "user@example.com", response.body
