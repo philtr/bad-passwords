@@ -6,7 +6,7 @@ Small Rails app for testing a simple SSO flow against a remotely hosted plaintex
 
 - `POST /register` stores an `email` and `password_hash_url` after proving the submitted plaintext password matches the remote Argon2 hash.
 - `POST /login` fetches the current hash from the stored URL, verifies the password, and returns an RS256-signed JWT.
-- `POST /validate` verifies a JWT with the configured RSA public key and returns the decoded payload.
+- `POST /validate` verifies a JWT with the configured RSA public key and expected issuer, then returns the decoded payload.
 - `DELETE /logout` rotates the user's token version using either valid credentials or a valid token, invalidating all previously issued tokens.
 - `/` provides a plain HTML test page with registration, login, the JWT public key, and API docs.
 - `/example.txt` returns a cached plaintext Argon2 hash for `test123`.
@@ -124,6 +124,8 @@ Failed token validation returns:
 ```json
 { "valid": false, "error": "Invalid token." }
 ```
+
+Validation rejects tokens with the wrong signature, issuer, expiration, or token version.
 
 Logout with credentials:
 

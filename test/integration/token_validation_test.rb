@@ -64,6 +64,25 @@ class TokenValidationTest < ActionDispatch::IntegrationTest
     assert_equal({ "valid" => false, "error" => "Invalid token." }, JSON.parse(response.body))
   end
 
+  test "rejects a token with the wrong issuer" do
+    token = JWT.encode(
+      {
+        "sub" => @user.email,
+        "iss" => "bad-passwords-other",
+        "ver" => @user.current_token_version,
+        "iat" => Time.current.to_i,
+        "exp" => 1.hour.from_now.to_i
+      },
+      JwtIssuer.private_key,
+      "RS256"
+    )
+
+    post "/validate", params: { token: token }, as: :json
+
+    assert_response :unauthorized
+    assert_equal({ "valid" => false, "error" => "Invalid token." }, JSON.parse(response.body))
+  end
+
   test "rejects a missing token" do
     post "/validate", params: {}, as: :json
 

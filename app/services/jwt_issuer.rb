@@ -10,7 +10,7 @@ class JwtIssuer
   end
 
   def self.decode(token)
-    payload, = JWT.decode(token, public_key, true, algorithm: "RS256")
+    payload, = JWT.decode(token, public_key, true, algorithm: "RS256", verify_iss: true, iss: issuer)
     payload
   end
 
@@ -39,6 +39,10 @@ class JwtIssuer
     Rails.configuration.x.jwt.public_key.presence || raise(KeyError, 'key not found: "JWT_PUBLIC_KEY"')
   end
 
+  def self.issuer
+    Rails.configuration.x.jwt.issuer
+  end
+
   private
 
   attr_reader :user
@@ -48,7 +52,7 @@ class JwtIssuer
 
     {
       "sub" => user.email,
-      "iss" => Rails.configuration.x.jwt.issuer,
+      "iss" => self.class.issuer,
       "ver" => user.current_token_version,
       "iat" => issued_at,
       "exp" => issued_at + TTL.to_i
