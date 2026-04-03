@@ -1,0 +1,52 @@
+<% content_for :title, "Validate Token" %>
+
+<% success_color = "#006400" %>
+<% error_color = "#8b0000" %>
+
+<h1>Validate Token</h1>
+
+<p>Paste a JWT to verify its signature with the configured public key.</p>
+
+<form action="/validate" method="post">
+  <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+
+  <p>
+    <label for="token">Token</label><br>
+    <textarea id="token" name="token" rows="12" cols="100"><%= @token %></textarea>
+  </p>
+
+  <p>
+    <button type="submit">Validate token</button>
+  </p>
+</form>
+
+<% if @validation_result %>
+  <h2 style="color: <%= @validation_result[:success] ? success_color : error_color %>;">
+    <%= @validation_result[:message] %>
+  </h2>
+
+  <% if @validation_result[:token].present? %>
+    <table border="1">
+      <tr>
+        <th>Token</th>
+        <td><%= @validation_result[:token] %></td>
+      </tr>
+    </table>
+  <% end %>
+
+  <% if @validation_result[:payload] %>
+    <h3>Decoded Token</h3>
+    <table border="1">
+      <% @validation_result[:payload].each do |key, value| %>
+        <tr>
+          <th><%= key %></th>
+          <td><%= value %></td>
+        </tr>
+      <% end %>
+    </table>
+  <% end %>
+<% end %>
+
+<hr>
+
+<p><a href="/">Home</a></p>

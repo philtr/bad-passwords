@@ -113,3 +113,45 @@
 <pre>{
   "error": "Invalid email or password."
 }</pre>
+
+<h3>POST /validate</h3>
+
+<p>Provide the JWT either as a JSON <code>token</code> field or in the <code>Authorization: Bearer &lt;token&gt;</code> header.</p>
+
+<table border="1">
+  <tr>
+    <th>Field</th>
+    <th>Required</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>token</td>
+    <td>yes, unless sent as Bearer token</td>
+    <td>JWT to validate with the configured public key.</td>
+  </tr>
+</table>
+
+<p>Example JSON request:</p>
+
+<pre>{
+  "token": "JWT_TOKEN_HERE"
+}</pre>
+
+<p>Successful JSON response:</p>
+
+<pre>{
+  "valid": true,
+  "payload": {
+    "sub": "user@example.com",
+    "iss": "bad-passwords-dev",
+    "iat": 1710000000,
+    "exp": 1710003600
+  }
+}</pre>
+
+<p>Error JSON response:</p>
+
+<pre>{
+  "valid": false,
+  "error": "Invalid token."
+}</pre>

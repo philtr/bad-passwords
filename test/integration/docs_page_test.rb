@@ -9,6 +9,7 @@ class DocsPageTest < ActionDispatch::IntegrationTest
     assert_match "API Docs", response.body
     assert_match "POST /register", response.body
     assert_match "POST /login", response.body
+    assert_match "POST /validate", response.body
   end
 
   test "links to the docs page from the home page" do
@@ -16,5 +17,6 @@ class DocsPageTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_match 'href="/docs"', response.body
+    assert_match 'href="/validate"', response.body
   end
 end

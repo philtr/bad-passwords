@@ -4,6 +4,8 @@ Rails.application.routes.draw do
   get "/docs", to: "pages#docs"
   get "/login_test", to: "pages#index"
   get "/example.txt", to: "pages#test_password"
+  get "/validate", to: "tokens#new"
   post "/register", to: "registrations#create"
   post "/login", to: "sessions#create"
+  post "/validate", to: "tokens#validate"
 end
