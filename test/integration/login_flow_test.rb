@@ -6,6 +6,7 @@ class LoginFlowTest < ActionDispatch::IntegrationTest
     keypair = OpenSSL::PKey::RSA.generate(2048)
     ENV["JWT_PRIVATE_KEY"] = keypair.to_pem
     ENV["JWT_PUBLIC_KEY"] = keypair.public_key.to_pem
+    JwtIssuer.reset_keys!
     @password = "correct horse battery staple"
     @hash = Argon2::Password.create(@password)
     User.create!(email: "user@example.com", password_hash_url: "https://example.com/hash.txt")

@@ -16,11 +16,16 @@ class JwtIssuer
   end
 
   def self.private_key
-    OpenSSL::PKey::RSA.new(normalized_key(ENV.fetch("JWT_PRIVATE_KEY")))
+    @private_key ||= OpenSSL::PKey::RSA.new(normalized_key(ENV.fetch("JWT_PRIVATE_KEY")))
   end
 
   def self.public_key
-    OpenSSL::PKey::RSA.new(normalized_key(ENV.fetch("JWT_PUBLIC_KEY")))
+    @public_key ||= OpenSSL::PKey::RSA.new(normalized_key(ENV.fetch("JWT_PUBLIC_KEY")))
+  end
+
+  def self.reset_keys!
+    @private_key = nil
+    @public_key = nil
   end
 
   def self.normalized_key(key)
