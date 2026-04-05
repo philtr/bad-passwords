@@ -10,6 +10,9 @@ class PagesController < ApplicationController
   def docs
   end
 
+  def faq
+  end
+
   def test_password
     render plain: Rails.cache.fetch("example_password_hash") { Argon2::Password.create("test123") }
   end
