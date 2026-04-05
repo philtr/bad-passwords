@@ -1,0 +1,28 @@
+<footer style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;" aria-label="Footer">
+  <% nav_items = [
+    [ "Home", "/" ],
+    [ "Docs", "/docs" ],
+    [ "FAQ", "/faq" ],
+    [ "Validate", "/validate" ]
+  ] %>
+
+  <div>
+    <% nav_items.each_with_index do |(label, path), index| %>
+      <% if current_page?(path) %>
+        <span aria-current="page"><%= label %></span>
+      <% else %>
+        <a href="<%= path %>"><%= label %></a>
+      <% end %>
+      <% unless index == nav_items.length - 1 %>
+        |
+      <% end %>
+    <% end %>
+  </div>
+
+  <div style="margin-left: auto; text-align: right;">
+    <div>Copyright © 2026 Phillip Ridlen</div>
+    <div>
+      <a href="https://github.com/philtr/bad-passwords" rel="noreferrer" target="_blank">GitHub</a>
+    </div>
+  </div>
+</footer>
