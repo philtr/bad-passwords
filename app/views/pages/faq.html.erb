@@ -1,0 +1,67 @@
+<% content_for :title, "Bad Passwords FAQ" %>
+<% content_for :meta_description, "Read the Bad Passwords FAQ for setup guidance, remote hash requirements, JWT behavior, and logout details." %>
+
+<%= render "pages/navigation" %>
+
+<h1>Bad Passwords FAQ</h1>
+
+<p>Answers to common questions about remote password hashes, delegated verification, JWT validation, and decisions that would make a normal auth team ask for a meeting.</p>
+
+<h2 id="contents">Contents</h2>
+
+<ul>
+  <li><a href="#what-is-this">What is this thing, actually?</a></li>
+  <li><a href="#login-flow">So when I log in, what happens?</a></li>
+  <li><a href="#public-hash">Isn’t posting your password hash publicly a bad idea?</a></li>
+  <li><a href="#why-argon2">Why Argon2, and what does “hard to crack” look like in numbers?</a></li>
+</ul>
+
+<hr>
+
+<h2 id="what-is-this">What is this thing, actually?</h2>
+
+<p>It is an authentication system that does <strong>not</strong> store your password hash locally. Instead, it stores your email address and a URL where your Argon2 password hash can be fetched on demand during login. Yes, that is weird. That is the point.</p>
+
+<p><a href="#contents">Back to contents</a></p>
+
+<hr>
+
+<h2 id="login-flow">So when I log in, what happens?</h2>
+
+<p>Bad Passwords fetches the hash from the URL you registered, checks the password you submitted against that hash, and if it matches, issues a signed JWT. If it does not match, login fails. On logout, the current token version is revoked, so older tokens stop validating too.</p>
+
+<p><a href="#contents">Back to contents</a></p>
+
+<hr>
+
+<h2 id="public-hash">Isn’t posting your password hash publicly a bad idea?</h2>
+
+<p>Probably. More precisely: it is not automatically catastrophic, but it is definitely not something you should do casually. Argon2 is a one-way, salted, memory-hard password hash, so someone who sees the hash cannot simply decrypt it and recover the password. The problem is offline guessing: if the hash is public, an attacker can keep trying password guesses locally until one matches. A strong random password makes that expensive and annoying; a weak password makes it a hobby.</p>
+
+<p><a href="#contents">Back to contents</a></p>
+
+<hr>
+
+<h2 id="why-argon2">Why Argon2?</h2>
+
+<p>Because if you are going to do something questionable, you should at least use a respectable password hashing algorithm. Argon2 is built for password hashing, not encryption. It is salted, tunable, and expensive enough in CPU and memory to make large-scale guessing attacks hurt more, especially on GPUs. That does not make it magic. It just means failure takes more effort.</p>
+
+<p>Very back-of-the-envelope math, but useful back-of-the-envelope math:</p>
+
+<ul>
+  <li>RFC 9106 gives a “frontend server authentication” Argon2id example at about <strong>0.5 seconds</strong> with <strong>1 GiB of RAM</strong> per guess.</li>
+  <li>Imagine an even ruder attacker box with <strong>32 RTX 4090</strong> cards, or about <strong>768 GiB of VRAM</strong> total.</li>
+  <li>If each guess needs <strong>1 GiB</strong>, that box can only run about <strong>768 guesses at once</strong>.</li>
+  <li>If each batch takes about <strong>0.5 seconds</strong>, the rough upper bound is about <strong>1,536 guesses per second</strong>.</li>
+  <li>A random <strong>10-character</strong> password from <strong>62 characters</strong> has <em>62<sup>10</sup></em> possibilities, so the average crack time is about <em>62<sup>10</sup> / (2 x 1,536)</em>.</li>
+  <li>That works out to about <strong>8.7 million years</strong>.</li>
+  <li>A random <strong>16-character</strong> password pushes the estimate to about <strong>4.9 x 10<sup>17</sup> years</strong>. The sun will probably burn out before the attacker correctly guesses your password.</li>
+</ul>
+
+<p>That is illustrative, not a promise. The point is that strong passwords plus aggressive memory settings force the attacker to spend real time, real hardware, and real money on a deeply embarrassing project.</p>
+
+<p><a href="#contents">Back to contents</a></p>
+
+<hr>
+
+<%= render "pages/navigation" %>
